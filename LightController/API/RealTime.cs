@@ -41,9 +41,7 @@ namespace LightController.API
             ConsoleOutput.WriteLine("  - Sending Frame", ConsoleColor.Yellow);
             
             byte[] frame = GenerateFrame(auth, ledSet);
-            UDPSendFrame(auth, frame, this.ipAddress, this.port);
-
-            Thread.Sleep(250);
+            UDPSendFrame(auth, frame, this.ipAddress, this.port, false);
         }
 
         public List<Led> GenerateSampleLedSet()
@@ -78,8 +76,7 @@ namespace LightController.API
            
             return leds;
         }
-
-
+        
         private byte[] GenerateFrame(LoginResponse response, List<Led> ledSet)
         {
             int byteSize = (this.ledCount * 4) + 10;

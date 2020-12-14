@@ -11,14 +11,21 @@ namespace LightController.UDP
 {
     using System;
     using System.Net.Sockets;
+    using System.Text;
 
     using LightController.API.Model;
+    using LightController.Helpers;
 
     public class UDPHelper
     {
-        internal void UDPSendFrame(LoginResponse auth, byte[] frame, string ipAddress, int port)
+        internal void UDPSendFrame(LoginResponse auth, byte[] frame, string ipAddress, int port, bool isDebugMode)
         {
             UdpClient udpClient = new UdpClient(ipAddress, port);
+
+            if (isDebugMode)
+            {
+                ConsoleOutput.WriteLine(HexDump.Write(frame), ConsoleColor.DarkGray);
+            }
 
             try
             {
