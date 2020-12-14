@@ -10,16 +10,22 @@
 namespace LightController
 {
     using System;
-    using System.Threading;
+    using System.Collections.Generic;
 
     using LightController.API;
+    using LightController.API.FrameData;
     using LightController.API.Model;
+
 
     public class Program
     {
         private static string baseUrl = "http://10.0.100.177";
 
-        static void Main(string[] args)
+        private static bool isRGBW = true;
+
+        private static int ledCount = 250;
+
+        public static void Main(string[] args)
         {
             Console.WriteLine("# SMART Led Lights Controller");
             Console.WriteLine("  - Base URL: " + baseUrl);
@@ -38,8 +44,6 @@ namespace LightController
             // Setup Mode
             Mode modeService = new Mode(baseUrl);
             modeService.GetMode(authResponse);
-            modeService.SetMode(authResponse, "off");
-
             modeService.SetMode(authResponse, "rt");
 
 
@@ -47,14 +51,20 @@ namespace LightController
             Brightness brightness = new Brightness(baseUrl);
             brightness.GetBrightness(authResponse);
             brightness.SetBrightness(authResponse, 95);
-            Thread.Sleep(1000);
 
-            RealTime realTimeMode = new RealTime(baseUrl, 7777, 250);
+            // Demo Real Time Mode
+            RealTime realTimeMode = new RealTime(baseUrl, 7777, ledCount, isRGBW);
 
-            while (true)
+            int i = 0;
+            while (i != 100)
             {
-                realTimeMode.SendFrame(authResponse);
+                List<Led> letSet = realTimeMode.GenerateSampleLedSet();
+                realTimeMode.SendFrame(authResponse, letSet);
+                i = i + 1;
             }
+
+            // Reset when done.
+            modeService.SetMode(authResponse, "movie");
 
             Console.WriteLine(Environment.NewLine + "Press Any Key to exit!");
 
