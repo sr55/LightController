@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Carol.cs" company="LightController Project (http://github.com/sr55/LightController)">
+// <copyright file="CarolDemoMode.cs" company="LightController Project (http://github.com/sr55/LightController)">
 //   This file is part of the LightController source code - It may be used under the terms of the MIT License.
 // </copyright>
 // <summary>
@@ -11,11 +11,29 @@ namespace LightController
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Timers;
 
+    using LibVLCSharp.Shared;
+
+    using LightController.API;
     using LightController.API.FrameData;
+    using LightController.API.Model;
+    using LightController.Helpers;
 
-    public class Carol
+    using NAudio.CoreAudioApi;
+
+    using Timer = System.Timers.Timer;
+
+    public class CarolDemoMode
     {
+        private static MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
+        private static MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+
         private static Led warmWhite = new Led(0, 0, 0, 255);
         private static Led coolWhite = new Led(255, 255, 255, 0);
         private static Led red = new Led(255, 0, 0, 0);
@@ -27,21 +45,92 @@ namespace LightController
         private readonly int ledCount;
         private readonly bool isRgbw;
 
+        private readonly RealTime realTime;
+
+        // State
+        private Dictionary<int, int> timeCodes = new Dictionary<int, int>();
+
         private int colourPattern = 3;
 
-        public Carol(int ledCount, bool isRGBW)
+        public CarolDemoMode(int ledCount, bool isRGBW, RealTime realTime)
         {
             this.ledCount = ledCount;
             this.isRgbw = isRGBW;
+            this.realTime = realTime;
         }
 
-        public List<Led> GetNextFrame(int ledCount)
+        public async Task Run(LoginResponse authResponse)
+        {
+            Console.WriteLine("  - Using Audio Device: " + device.DeviceFriendlyName);
+
+            string[] options = new List<string>().ToArray();
+            ParseProfile();
+
+            LibVLCSharp.Shared.Core.Initialize();
+            using (var libvlc = new LibVLC(false, options))
+            {
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "carol.m4a");
+
+                using (var media = new Media(libvlc, new Uri(path)))
+                {
+                    using (var mediaplayer = new MediaPlayer(media))
+                    {
+                        mediaplayer.Play();
+                        await Task.Delay(500);
+
+                        while (mediaplayer.IsPlaying)
+                        {
+                            TimeSpan totalSeconds = TimeSpan.FromMilliseconds(mediaplayer.Time);
+                            int level = (int)Math.Round(device.AudioMeterInformation.MasterPeakValue * 50, 0);
+
+                            ConsoleOutput.WriteLine(string.Format("  - {0} with Level {1}", totalSeconds, level), ConsoleColor.White);
+
+                            foreach (var record in this.timeCodes.OrderByDescending(o => o.Key))
+                            {
+                                if (totalSeconds.TotalSeconds > record.Key)
+                                {
+                                    this.SetPattern(record.Value);
+                                    break;
+                                }
+                            }
+
+                            List<Led> letSet = this.GetNextFrame(level);
+                            this.realTime.SendFrame(authResponse, letSet);
+
+                            Thread.Sleep(150);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ParseProfile()
+        {
+            using (StreamReader reader = new StreamReader("carol.txt"))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Contains("#"))
+                    {
+                        continue;
+                    }
+
+                    string[] items = line.Split(",");
+                    int seconds = int.Parse(items[0].Trim());
+                    int level = int.Parse(items[1].Trim());
+                    timeCodes.Add(seconds, level);
+                }
+            }
+        }
+        
+        private List<Led> GetNextFrame(int ledCount)
         {
             List<Led> frame = this.GenerateFullFrame(ledCount);
             return frame;
         }
 
-        public void SetPattern(int i)
+        private void SetPattern(int i)
         {
             this.colourPattern = i;
         }
@@ -67,7 +156,7 @@ namespace LightController
             return leds;
         }
 
-        public Led PickColourPattern()
+        private Led PickColourPattern()
         {
             switch (this.colourPattern)
             {
@@ -86,22 +175,22 @@ namespace LightController
             return off;
         }
 
-        public Led PickWhite()
+        private Led PickWhite()
         {
             return coolWhite;
         }
 
-        public Led PickWarmWhite()
+        private Led PickWarmWhite()
         {
             return warmWhite;
         }
 
-        public Led PickBlue()
+        private Led PickBlue()
         {
             return blue;
         }
 
-        public Led PickBlueWhite()
+        private Led PickBlueWhite()
         {
             Random rnd = new Random();
 
@@ -117,8 +206,8 @@ namespace LightController
 
             return off;
         }
-        
-        public Led PickRandomColour()
+
+        private Led PickRandomColour()
         {
             Random rnd = new Random();
 
