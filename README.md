@@ -1,7 +1,19 @@
-# LightController (Twinkly LED Christmas Lights)
+# Light Controller (Twinkly LED Christmas Lights)
 
-A simple C# / .NET Core 5 wrapper library for the Twinly Private API
+Written in C# utilising .NET Core 5
 
-This is a partial implmentation with demo project to control the lights via UDP
+This is a basic implementation of the private API used to control the device. This is based off the documentation at https://xled.readthedocs.io/en/latest/
 
-Thanks to the documentaiton at https://xled.readthedocs.io/en/latest/
+API Implemented: 
+- Authentication and Verification
+- Set Mode
+- Set Brightness
+
+UDP
+- Send UDP Packets. (Can be used to send frames to the lights to control what they do)
+
+Light Sets Supported:
+- 250 RGBW
+
+
+Demo Project Provided for Windows.
