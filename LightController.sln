@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LightController", "LightController\LightController.csproj", "{210BD08D-206E-4A40-A056-79C02A9FAA7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightController.Demo", "LightController.Demo\LightController.Demo.csproj", "{D69C55D4-6988-4606-9C80-32E22E89380A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LightController.Win.Demo", "LightController.Win.Demo\LightController.Win.Demo.csproj", "{349DF915-6B5E-4B8C-B25B-FA5F158760F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{210BD08D-206E-4A40-A056-79C02A9FAA7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{210BD08D-206E-4A40-A056-79C02A9FAA7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{210BD08D-206E-4A40-A056-79C02A9FAA7B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D69C55D4-6988-4606-9C80-32E22E89380A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D69C55D4-6988-4606-9C80-32E22E89380A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D69C55D4-6988-4606-9C80-32E22E89380A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D69C55D4-6988-4606-9C80-32E22E89380A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{349DF915-6B5E-4B8C-B25B-FA5F158760F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{349DF915-6B5E-4B8C-B25B-FA5F158760F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{349DF915-6B5E-4B8C-B25B-FA5F158760F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{349DF915-6B5E-4B8C-B25B-FA5F158760F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

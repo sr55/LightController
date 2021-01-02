@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LightController
+namespace LightController.Win.Demo
 {
     using System;
     using System.Collections.Generic;

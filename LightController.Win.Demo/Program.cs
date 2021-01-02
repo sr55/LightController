@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using LightController.API;
 using LightController.API.Model;
 
-namespace LightController.Demo
+namespace LightController.Win.Demo
 {
     public class Program
     {
