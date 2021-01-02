@@ -24,7 +24,7 @@ namespace LightController.UDP
 
             if (isDebugMode)
             {
-                ConsoleOutput.WriteLine(HexDump.Write(frame), ConsoleColor.DarkGray);
+                ConsoleOutput.WriteLine(HexDump.Write(frame), ConsoleColor.White);
             }
 
             try

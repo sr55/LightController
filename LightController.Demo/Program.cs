@@ -3,26 +3,25 @@
 //   This file is part of the LightController source code - It may be used under the terms of the MIT License.
 // </copyright>
 // <summary>
-//   Defines the Program type.
+//   Defines the UDPHelper type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LightController
+
+using System;
+using System.Threading.Tasks;
+using LightController.API;
+using LightController.API.Model;
+
+namespace LightController.Demo
 {
-    using System;
-    using System.Threading.Tasks;
-
-    using LightController.API;
-    using LightController.API.Model;
-
     public class Program
     {
         // Config
         private static string baseUrl = "http://10.0.100.177";
         private static bool isRGBW = true;
         private static int ledCount = 250;
-
-
+        
         public static async Task Main(string[] args)
         {
             Console.WriteLine("# SMART Led Lights Controller");
@@ -43,7 +42,7 @@ namespace LightController
             Mode modeService = new Mode(baseUrl);
             modeService.GetMode(authResponse);
             modeService.SetMode(authResponse, "rt");
-            
+
             // Setup Brightness
             Brightness brightness = new Brightness(baseUrl);
             brightness.GetBrightness(authResponse);
@@ -52,7 +51,9 @@ namespace LightController
             // Demo Real Time Mode
             RealTime realTimeMode = new RealTime(baseUrl, 7777, ledCount, isRGBW);
             CarolDemoMode carol = new CarolDemoMode(ledCount, isRGBW, realTimeMode);
-            
+
+            Console.Read();
+
             Task t = carol.Run(authResponse);
             t.Wait();
 

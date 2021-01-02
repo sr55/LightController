@@ -11,12 +11,10 @@ namespace LightController
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Timers;
 
     using LibVLCSharp.Shared;
 
@@ -26,8 +24,6 @@ namespace LightController
     using LightController.Helpers;
 
     using NAudio.CoreAudioApi;
-
-    using Timer = System.Timers.Timer;
 
     public class CarolDemoMode
     {
@@ -40,6 +36,7 @@ namespace LightController
         private static Led green = new Led(0, 255, 0, 0);
         private static Led blue = new Led(0, 0, 255, 0);
         private static Led yellow = new Led(255, 255, 0, 0);
+        private static Led Purple = new Led(128, 0, 128, 0);
         private static Led off = new Led(0, 0, 0, 0);
 
         private readonly int ledCount;
@@ -64,9 +61,9 @@ namespace LightController
             Console.WriteLine("  - Using Audio Device: " + device.DeviceFriendlyName);
 
             string[] options = new List<string>().ToArray();
-            ParseProfile();
+            this.ParseProfile();
 
-            LibVLCSharp.Shared.Core.Initialize();
+            Core.Initialize();
             using (var libvlc = new LibVLC(false, options))
             {
                 string path = Path.Combine(Directory.GetCurrentDirectory(), "carol.m4a");
@@ -81,8 +78,9 @@ namespace LightController
                         while (mediaplayer.IsPlaying)
                         {
                             TimeSpan totalSeconds = TimeSpan.FromMilliseconds(mediaplayer.Time);
-                            int level = (int)Math.Round(device.AudioMeterInformation.MasterPeakValue * 50, 0);
-
+                            int level = (int)Math.Round(device.AudioMeterInformation.MasterPeakValue * 100, 0);
+                            level = Math.Min(this.GetMax(level), level);
+         
                             ConsoleOutput.WriteLine(string.Format("  - {0} with Level {1}", totalSeconds, level), ConsoleColor.White);
 
                             foreach (var record in this.timeCodes.OrderByDescending(o => o.Key))
@@ -123,6 +121,32 @@ namespace LightController
                 }
             }
         }
+
+        private int GetMax(int level)
+        {
+            switch (level)
+            {
+                case 1:
+                    return 10;
+                case 2:
+                    return 20;
+
+                case 3:
+                    return 40;
+
+                case 4:
+                    return 60;
+
+                case 5:
+                    return 75;
+
+                case 6:
+                    return 100;
+
+                default:
+                    return 100;
+            }
+        }
         
         private List<Led> GetNextFrame(int ledCount)
         {
@@ -143,14 +167,7 @@ namespace LightController
 
             for (int i = 0; i < this.ledCount; i++)
             {
-                if (this.IsLedEnabled(randomLedIndexes, i))
-                {
-                    leds.Add(this.PickColourPattern());
-                }
-                else
-                {
-                    leds.Add(off);
-                }
+                leds.Add(this.IsLedEnabled(randomLedIndexes, i) ? this.PickColourPattern() : off);
             }
 
             return leds;
@@ -167,8 +184,10 @@ namespace LightController
                 case 3:
                     return this.PickBlueWhite();
                 case 4:
-                    return this.PickRandomColour();
+                    return this.PickPurpleWhite();
                 case 5:
+                    return this.PickRandomColour();
+                case 6:
                     return this.PickWarmWhite();
             }
 
@@ -200,6 +219,23 @@ namespace LightController
             {
                 case 1:
                     return blue;
+                case 2:
+                    return coolWhite;
+            }
+
+            return off;
+        }
+
+        private Led PickPurpleWhite()
+        {
+            Random rnd = new Random();
+
+            int randomNumber = rnd.Next(1, 3);
+
+            switch (randomNumber)
+            {
+                case 1:
+                    return Purple;
                 case 2:
                     return coolWhite;
             }

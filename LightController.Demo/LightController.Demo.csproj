@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <AssemblyName>LightController</AssemblyName>
-    <RootNamespace>LightController</RootNamespace>
-    <PackageId>LightController</PackageId>
+    <AssemblyName>LightController.Demo</AssemblyName>
+    <RootNamespace>LightController.Demo</RootNamespace>
+    <PackageId>LightController.Demo</PackageId>
     <Authors>SRae</Authors>
-    <Product>LightController</Product>
+    <Product>LightController.Demo</Product>
 
     <Copyright>Copyright © 2021 SRae</Copyright>
     <Description>A small application for controlling XLED XMAS Lighting</Description>
@@ -22,10 +23,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp" Version="3.4.9" />
-    <PackageReference Include="NAudio" Version="2.0.0-beta1" />
-    <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.1" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.11" />
+    <ProjectReference Include="..\LightController\LightController.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="carol.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

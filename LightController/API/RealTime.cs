@@ -41,7 +41,7 @@ namespace LightController.API
             ConsoleOutput.WriteLine("  - Sending Frame", ConsoleColor.Yellow);
             
             byte[] frame = GenerateFrame(auth, ledSet);
-            UDPSendFrame(auth, frame, this.ipAddress, this.port, false);
+            UDPSendFrame(auth, frame, this.ipAddress, this.port, true);
         }
 
         public List<Led> GenerateSampleLedSet()
