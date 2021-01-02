@@ -26,12 +26,12 @@ jobs:
     - name: Upload Library
       uses: actions/upload-artifact@v2
       with:
-        name: HandBrake-x86_64-Win_GUI-EXE
+        name: LightController.API
         path: LightController/bin/Debug
 
     - name: Upload Demo Project
       uses: actions/upload-artifact@v2
       with:
-        name: HandBrake-x86_64-Win_GUI-EXE
+        name: LightController.Win.Demo
         path: LightController.Win.Demo/bin/Debug
     
