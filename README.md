@@ -1,4 +1,4 @@
-# Light Controller (Twinkly LED Christmas Lights)
+# Light Controller (Twinkly LED Christmas Lights) ![Build](https://github.com/sr55/LightController/workflows/Build/badge.svg)
 
 Written in C# utilising .NET Core 5
 
