@@ -7,24 +7,21 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LightController.Win.Demo
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using LibVLCSharp.Shared;
+using LightController.API;
+using LightController.API.FrameData;
+using LightController.API.Model;
+using LightController.Helpers;
+using NAudio.CoreAudioApi;
+
+namespace LightController.Win.Demo.LightModes
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using LibVLCSharp.Shared;
-
-    using LightController.API;
-    using LightController.API.FrameData;
-    using LightController.API.Model;
-    using LightController.Helpers;
-
-    using NAudio.CoreAudioApi;
-
     public class CarolDemoMode
     {
         private static MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
@@ -117,7 +114,7 @@ namespace LightController.Win.Demo
                     string[] items = line.Split(",");
                     int seconds = int.Parse(items[0].Trim());
                     int level = int.Parse(items[1].Trim());
-                    timeCodes.Add(seconds, level);
+                    this.timeCodes.Add(seconds, level);
                 }
             }
         }
