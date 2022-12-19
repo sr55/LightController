@@ -3,5 +3,8 @@
   "IsRGBWSet": true,
   "LedCount": 250,
   "Mode": 1,
-  "SendHttpFrames" : false 
+  "SendHttpFrames": true,
+  "DebugMode": false,
+  "MusicFile": "carol2.wav",
+  "CarolPatternFile":  "carol2.txt"
 }

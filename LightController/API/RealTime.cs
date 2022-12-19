@@ -37,17 +37,17 @@ namespace LightController.API
             this.ipAddress = baseUrl.Replace("http://", string.Empty, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public void SendFrame(LoginResponse auth, List<Led> ledSet)
+        public void SendFrame(LoginResponse auth, List<Led> ledSet, bool isDebugMode, int frameNumber)
         {
-            ConsoleOutput.WriteLine("  - Sending Frame", ConsoleColor.Yellow);
-            
+            ConsoleOutput.WriteLine(string.Format("  - Sending Frame {0} (UDP)", frameNumber), ConsoleColor.Yellow);
+
             byte[] frame = GenerateFrame(auth, ledSet, false);
-            UDPHelper.SendFrame(auth, frame, this.ipAddress, this.port, true);
+            UDPHelper.SendFrame(auth, frame, this.ipAddress, this.port, isDebugMode);
         }
 
-        public void SendFrameHttp(LoginResponse token, List<Led> ledSet)
+        public void SendFrameHttp(LoginResponse token, List<Led> ledSet, bool isDebugMode, int frameNumber)
         {
-            ConsoleOutput.WriteLine("  - Sending Frame (HTTP)", ConsoleColor.Yellow);
+            ConsoleOutput.WriteLine(string.Format("  - Sending Frame {0} (HTTP)", frameNumber), ConsoleColor.Yellow);
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Auth-Token", token.Authentication_token);

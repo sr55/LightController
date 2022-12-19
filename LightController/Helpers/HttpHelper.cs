@@ -15,7 +15,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using LightController.Helpers.Model;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace LightController.Helpers
 {

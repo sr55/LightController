@@ -4,9 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using LightController.Services.Config.Model;
+using LightController.Win.Demo.Services.Config.Model;
 
-namespace LightController.Services.Config.Interfaces
+namespace LightController.Win.Demo.Services.Config.Interfaces
 {
     public interface IConfigService
     {

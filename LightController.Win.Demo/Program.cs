@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using LightController.API;
 using LightController.API.Model;
 using LightController.Helpers;
-using LightController.Services.Config;
-using LightController.Services.Config.Model;
 using LightController.Win.Demo.LightModes;
+using LightController.Win.Demo.Services.Config;
+using LightController.Win.Demo.Services.Config.Model;
 
 namespace LightController.Win.Demo
 {
@@ -70,16 +70,10 @@ namespace LightController.Win.Demo
                 case 2: // Flash each LED to allow mapping
                     MapLinesMode mapTreeLightsMode = new MapLinesMode(options.LedCount, realTimeMode);
                     Console.Read();
-                    Task t2 = mapTreeLightsMode.Run(authResponse);
+                    Task t2 = mapTreeLightsMode.Run(authResponse, options.DebugMode);
                     t2.Wait();
                     break;
 
-                case 3: // Flash each LED to allow mapping
-                    MapLinesMode mapTreeLightsModeB = new MapLinesMode(options.LedCount, realTimeMode);
-                    Console.Read();
-                    Task t3 = mapTreeLightsModeB.RunManual(authResponse);
-                    t3.Wait();
-                    break;
                 case 4: // Reset
 
                     break;

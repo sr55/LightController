@@ -6,10 +6,10 @@
 
 using System.IO;
 using System.Text.Json;
-using LightController.Services.Config.Interfaces;
-using LightController.Services.Config.Model;
+using LightController.Win.Demo.Services.Config.Interfaces;
+using LightController.Win.Demo.Services.Config.Model;
 
-namespace LightController.Services.Config
+namespace LightController.Win.Demo.Services.Config
 {
     public class ConfigService : IConfigService
     {

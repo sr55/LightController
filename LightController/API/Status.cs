@@ -13,8 +13,6 @@ namespace LightController.API
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Threading.Tasks;
-
-    using LightController.API.CommandObjects;
     using LightController.API.Model;
     using LightController.Helpers;
 

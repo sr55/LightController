@@ -22,7 +22,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UDP\" />
+    <Compile Remove="UDP\**" />
+    <EmbeddedResource Remove="UDP\**" />
+    <None Remove="UDP\**" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LightController.Services.Config.Model
+namespace LightController.Win.Demo.Services.Config.Model
 {
     public class ConfigOptions
     {
@@ -27,5 +27,9 @@ namespace LightController.Services.Config.Model
         public int Mode { get; set; }
 
         public bool SendHttpFrames { get; set; }
+
+        public bool DebugMode { get; set; }
+        public string MusicFile { get; set; }
+        public string CarolPatternFile { get; set; }
     }
 }
