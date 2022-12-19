@@ -7,6 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +33,17 @@ namespace LightController.Win.Demo.LightModes
             this.realTime = realTime;
         }
 
+        public async Task RunManual(LoginResponse authResponse)
+        {
+
+            for (int i = 0; i < this.ledCount; i++)
+            {
+                List<Led> letSet = this.BuildFrame(i);
+                this.realTime.SendFrame(authResponse, letSet);
+                Console.Read();
+            }
+        }
+
         public async Task Run(LoginResponse authResponse)
         {
 
@@ -39,7 +51,7 @@ namespace LightController.Win.Demo.LightModes
             {
                 List<Led> letSet = this.BuildFrame(i);
                 this.realTime.SendFrame(authResponse, letSet);
-                Thread.Sleep(10);
+                Thread.Sleep(20);
             }
         }
 

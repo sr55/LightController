@@ -17,9 +17,8 @@ namespace LightController.API
     using LightController.API.CommandObjects;
     using LightController.API.Model;
     using LightController.Helpers;
-    using LightController.HTTP;
 
-    public class Mode : HttpRequestBase
+    public class Mode
     {
         private readonly string baseUrl;
 
@@ -35,12 +34,12 @@ namespace LightController.API
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Auth-Token", token.Authentication_token);
 
-            var task = Task.Run(async () => await this.MakeGETRequest(this.baseUrl + this.modeUrl, headers));
+            var task = Task.Run(async () => await HttpHelper.MakeGETRequest(this.baseUrl + this.modeUrl, headers));
             task.Wait();
 
             if (task.Result != null && task.Result.WasSuccessful)
             {
-                ModeResponse response = JsonSerializer.Deserialize<ModeResponse>(task.Result.JsonResponse, JsonOptions);
+                ModeResponse response = JsonSerializer.Deserialize<ModeResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
                 if (response != null)
                 {
                     ConsoleOutput.WriteLine(string.Format("  Lights Mode: ({0})", response.Mode), ConsoleColor.Cyan);
@@ -63,14 +62,14 @@ namespace LightController.API
             headers.Add("X-Auth-Token", token.Authentication_token);
 
             ModeSet setMode = new ModeSet(mode);
-            string jsonString = JsonSerializer.Serialize(setMode, JsonOptions);
+            string jsonString = JsonSerializer.Serialize(setMode, HttpHelper.JsonOptions);
 
-            var task = Task.Run(async () => await this.MakePOSTRequest(this.baseUrl + this.modeUrl, jsonString, headers));
+            var task = Task.Run(async () => await HttpHelper.MakePOSTRequest(this.baseUrl + this.modeUrl, jsonString, headers));
             task.Wait();
 
             if (task.Result != null && task.Result.WasSuccessful)
             {
-                ModeResponse response = JsonSerializer.Deserialize<ModeResponse>(task.Result.JsonResponse, JsonOptions);
+                ModeResponse response = JsonSerializer.Deserialize<ModeResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
                 if (response != null)
                 {
                     response.Mode = mode;

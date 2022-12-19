@@ -2,5 +2,6 @@
   "LightsUrl": "http://10.0.1.155",
   "IsRGBWSet": true,
   "LedCount": 250,
-  "Mode": 2
+  "Mode": 1,
+  "SendHttpFrames" : false 
 }

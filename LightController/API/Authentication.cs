@@ -17,9 +17,8 @@ namespace LightController.API
     using LightController.API.CommandObjects;
     using LightController.API.Model;
     using LightController.Helpers;
-    using LightController.HTTP;
 
-    public class Authentication : HttpRequestBase
+    public class Authentication
     {
         private readonly string baseUrl;
 
@@ -35,14 +34,14 @@ namespace LightController.API
         {
             ConsoleOutput.WriteLine("- Logging into Lights", ConsoleColor.Yellow);
             Login login = new Login();
-            string jsonString = JsonSerializer.Serialize(login, JsonOptions);
+            string jsonString = JsonSerializer.Serialize(login, HttpHelper.JsonOptions);
 
-            var task = Task.Run(async () => await this.MakePOSTRequest(this.baseUrl + this.loginUrl, jsonString, null));
+            var task = Task.Run(async () => await HttpHelper.MakePOSTRequest(this.baseUrl + this.loginUrl, jsonString, null));
             task.Wait();
 
             if (task.Result != null && task.Result.WasSuccessful)
             {
-                LoginResponse response = JsonSerializer.Deserialize<LoginResponse>(task.Result.JsonResponse, JsonOptions);
+                LoginResponse response = JsonSerializer.Deserialize<LoginResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
                 if (response != null && response.Code == 1000)
                 {
                     ConsoleOutput.WriteLine("  Logged In!", ConsoleColor.Green);
@@ -68,14 +67,14 @@ namespace LightController.API
             headers.Add("X-Auth-Token", token.Authentication_token);
 
             Verify login = new Verify(token.ChallengeResponse);
-            string jsonString = JsonSerializer.Serialize(login, JsonOptions);
+            string jsonString = JsonSerializer.Serialize(login, HttpHelper.JsonOptions);
 
-            var task = Task.Run(async () => await this.MakePOSTRequest(this.baseUrl + this.verifyLogin, jsonString, headers));
+            var task = Task.Run(async () => await HttpHelper.MakePOSTRequest(this.baseUrl + this.verifyLogin, jsonString, headers));
             task.Wait();
 
             if (task.Result != null && task.Result.WasSuccessful)
             {
-                VerifyResponse response = JsonSerializer.Deserialize<VerifyResponse>(task.Result.JsonResponse, JsonOptions);
+                VerifyResponse response = JsonSerializer.Deserialize<VerifyResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
                 if (response != null && response.Code == 1000)
                 {
                     ConsoleOutput.WriteLine("- Login Verified", ConsoleColor.Green);

@@ -18,69 +18,65 @@ namespace LightController.API
     using LightController.API.Model;
     using LightController.Helpers;
 
-    public class Brightness
+    public class Status
     {
         private readonly string baseUrl;
 
-        private string modeUrl = "/xled/v1/led/out/brightness";
+        private string statusUrl = "/xled/v1/status";
+        private string deviceNameUrl = "/xled/v1/device_name";
 
-        public Brightness(string baseUrl)
+        public Status(string baseUrl)
         {
             this.baseUrl = baseUrl;
         }
         
-        public BrightnessResponse GetBrightness(LoginResponse token)
+        public StatusResponse GetStatus(LoginResponse token)
         {
-            ConsoleOutput.WriteLine("- Fetching Brightness", ConsoleColor.Yellow);
+            ConsoleOutput.WriteLine("- Fetching Status", ConsoleColor.Yellow);
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Auth-Token", token.Authentication_token);
 
-            var task = Task.Run(async () => await HttpHelper.MakeGETRequest(this.baseUrl + this.modeUrl, headers));
+            var task = Task.Run(async () => await HttpHelper.MakeGETRequest(this.baseUrl + this.statusUrl, headers));
             task.Wait();
 
             if (task.Result != null && task.Result.WasSuccessful)
             {
-                BrightnessResponse response = JsonSerializer.Deserialize<BrightnessResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
+                StatusResponse response = JsonSerializer.Deserialize<StatusResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
                 if (response != null)
                 {
-                    ConsoleOutput.WriteLine(string.Format("  Brightness Level: ({0})", response.Value), ConsoleColor.Cyan);
+                    ConsoleOutput.WriteLine(string.Format("  Status Code: ({0})", response.Code), ConsoleColor.Cyan);
                     return response;
                 }
             }
             else
             {
-                ConsoleOutput.WriteLine(string.Format("  Get Brightness Failed ({0})", task.Result?.JsonResponse), ConsoleColor.Red);
+                ConsoleOutput.WriteLine(string.Format("  Get Status Failed ({0})", task.Result?.JsonResponse), ConsoleColor.Red);
             }
 
             return null;
         }
 
-        public BrightnessResponse SetBrightness(LoginResponse token, int value)
+        public DeviceNameResponse GetDeviceName(LoginResponse token)
         {
-            ConsoleOutput.WriteLine(string.Format("- Set Brightness to: {0}", value), ConsoleColor.Yellow);
-
+            ConsoleOutput.WriteLine("- Fetching Device Name", ConsoleColor.Yellow);
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Auth-Token", token.Authentication_token);
 
-            BrightnessCommand setMode = new BrightnessCommand("enabled", "A", value);
-            string jsonString = JsonSerializer.Serialize(setMode, HttpHelper.JsonOptions);
-
-            var task = Task.Run(async () => await HttpHelper.MakePOSTRequest(this.baseUrl + this.modeUrl, jsonString, headers));
+            var task = Task.Run(async () => await HttpHelper.MakeGETRequest(this.baseUrl + this.statusUrl, headers));
             task.Wait();
 
             if (task.Result != null && task.Result.WasSuccessful)
             {
-                BrightnessResponse response = JsonSerializer.Deserialize<BrightnessResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
+                DeviceNameResponse response = JsonSerializer.Deserialize<DeviceNameResponse>(task.Result.JsonResponse, HttpHelper.JsonOptions);
                 if (response != null)
                 {
-                    response.Value = value;
-                    ConsoleOutput.WriteLine(string.Format("  Brightness Set: ({0})", response.Value), ConsoleColor.Cyan);
+                    ConsoleOutput.WriteLine(string.Format("  Device Name: ({0})", response.Name), ConsoleColor.Cyan);
                     return response;
                 }
             }
             else
             {
-                ConsoleOutput.WriteLine(string.Format("  Set Brightness Failed ({0})", task.Result?.JsonResponse), ConsoleColor.Red);
+                ConsoleOutput.WriteLine(string.Format("  Get Device Name Failed ({0})", task.Result?.JsonResponse), ConsoleColor.Red);
             }
 
             return null;

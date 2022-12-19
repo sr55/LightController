@@ -9,16 +9,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LibVLCSharp.Shared;
 using LightController.API;
 using LightController.API.FrameData;
 using LightController.API.Model;
 using LightController.Helpers;
+using LightController.Services.Config.Model;
+using LightController.Win.Demo.LightModes.Model;
 using NAudio.CoreAudioApi;
+using NAudio.Utils;
+using NAudio.Wave;
+using NAudio.WaveFormRenderer;
 
 namespace LightController.Win.Demo.LightModes
 {
@@ -42,7 +48,7 @@ namespace LightController.Win.Demo.LightModes
         private readonly RealTime realTime;
 
         // State
-        private Dictionary<int, int> timeCodes = new Dictionary<int, int>();
+        private Dictionary<double, CarolModel> timeCodes = new Dictionary<double, CarolModel>();
 
         private int colourPattern = 3;
 
@@ -53,55 +59,80 @@ namespace LightController.Win.Demo.LightModes
             this.realTime = realTime;
         }
 
-        public async Task Run(LoginResponse authResponse)
+        private void RenderWaveForm(string path)
+        {
+            var settings = new StandardWaveFormRendererSettings();
+            settings.Width = 840;
+            settings.TopHeight = 96;
+            settings.BottomHeight = 96;
+
+            var averagePeakProvider = new AveragePeakProvider(4);
+
+            WaveFormRenderer renderer = new WaveFormRenderer();
+            Image image = renderer.Render(new WaveFileReader(path), averagePeakProvider, settings);
+
+            string filename = Path.GetFileNameWithoutExtension(path);
+
+            image.Save(string.Format("{0}.png", filename), ImageFormat.Png);
+        }
+
+        public async Task Run(LoginResponse authResponse, ConfigOptions config)
         {
             Console.WriteLine("  - Using Audio Device: " + device.DeviceFriendlyName);
 
-            string[] options = new List<string>().ToArray();
             this.ParseProfile();
 
-            Core.Initialize();
-            using (var libvlc = new LibVLC(false, options))
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "carol.wav");
+
+            RenderWaveForm(path);
+
+            using (var audioFile = new AudioFileReader(path))
+            using (var outputDevice = new WaveOutEvent())
             {
-                string path = Path.Combine(Directory.GetCurrentDirectory(), "carol.m4a");
-
-                using (var media = new Media(libvlc, new Uri(path)))
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+                while (outputDevice.PlaybackState == PlaybackState.Playing)
                 {
-                    using (var mediaplayer = new MediaPlayer(media))
+                    TimeSpan totalSeconds = outputDevice.GetPositionTimeSpan();
+                    int level = (int)Math.Round(device.AudioMeterInformation.MasterPeakValue * 100, 0);
+                    level = Math.Min(this.GetMax(level), level);
+
+                    ConsoleOutput.WriteLine(string.Format("  - {0} with Level {1}", totalSeconds, level), ConsoleColor.White);
+
+                    foreach (var record in this.timeCodes.OrderByDescending(o => o.Key))
                     {
-                        mediaplayer.Play();
-                        await Task.Delay(500);
-
-                        while (mediaplayer.IsPlaying)
+                        if (totalSeconds.TotalSeconds > record.Key)
                         {
-                            TimeSpan totalSeconds = TimeSpan.FromMilliseconds(mediaplayer.Time);
-                            int level = (int)Math.Round(device.AudioMeterInformation.MasterPeakValue * 100, 0);
-                            level = Math.Min(this.GetMax(level), level);
-         
-                            ConsoleOutput.WriteLine(string.Format("  - {0} with Level {1}", totalSeconds, level), ConsoleColor.White);
-
-                            foreach (var record in this.timeCodes.OrderByDescending(o => o.Key))
+                            if (record.Value.IntensityOverride.HasValue)
                             {
-                                if (totalSeconds.TotalSeconds > record.Key)
-                                {
-                                    this.SetPattern(record.Value);
-                                    break;
-                                }
+                                level = record.Value.IntensityOverride.Value * 2;
                             }
 
-                            List<Led> letSet = this.GetNextFrame(level);
-                            this.realTime.SendFrame(authResponse, letSet);
-
-                            Thread.Sleep(150);
+                            this.SetPattern(record.Value.Mode);
+                            break;
                         }
                     }
+
+                    List<Led> letSet = this.GetNextFrame(level);
+
+                    if (config.SendHttpFrames)
+                    {
+                        this.realTime.SendFrameHttp(authResponse, letSet);
+                    }
+                    else
+                    {
+                        this.realTime.SendFrame(authResponse, letSet);
+                    }
+
+                    Thread.Sleep(70);
                 }
             }
+
         }
 
         private void ParseProfile()
         {
-            using (StreamReader reader = new StreamReader("carol.txt"))
+            using (StreamReader reader = new StreamReader("carol2.txt"))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -112,9 +143,16 @@ namespace LightController.Win.Demo.LightModes
                     }
 
                     string[] items = line.Split(",");
-                    int seconds = int.Parse(items[0].Trim());
-                    int level = int.Parse(items[1].Trim());
-                    this.timeCodes.Add(seconds, level);
+                    double seconds = double.Parse(items[0].Trim());
+                    int mode = int.Parse(items[1].Trim());
+                    int levelOveride = int.Parse(items[2].Trim());
+
+                    CarolModel carolMode = new CarolModel();
+                    carolMode.TimeCode = seconds;
+                    carolMode.Mode = mode;
+                    carolMode.IntensityOverride = levelOveride > 0 ? levelOveride : null;
+
+                    this.timeCodes.Add(seconds, carolMode);
                 }
             }
         }
@@ -144,7 +182,7 @@ namespace LightController.Win.Demo.LightModes
                     return 100;
             }
         }
-        
+
         private List<Led> GetNextFrame(int ledCount)
         {
             List<Led> frame = this.GenerateFullFrame(ledCount);
@@ -183,7 +221,7 @@ namespace LightController.Win.Demo.LightModes
                 case 4:
                     return this.PickPurpleWhite();
                 case 5:
-                    return this.PickRandomColour();
+                    return this.PickRedYellow();
                 case 6:
                     return this.PickWarmWhite();
             }
@@ -235,6 +273,24 @@ namespace LightController.Win.Demo.LightModes
                     return Purple;
                 case 2:
                     return coolWhite;
+            }
+
+            return off;
+        }
+
+
+        private Led PickRedYellow()
+        {
+            Random rnd = new Random();
+
+            int randomNumber = rnd.Next(1, 3);
+
+            switch (randomNumber)
+            {
+                case 1:
+                    return red;
+                case 2:
+                    return yellow;
             }
 
             return off;

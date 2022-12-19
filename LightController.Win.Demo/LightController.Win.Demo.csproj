@@ -23,9 +23,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp" Version="3.6.1" />
     <PackageReference Include="NAudio" Version="2.0.1" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.16" />
+    <PackageReference Include="NAudio.WaveFormRenderer" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="carol2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="carol.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

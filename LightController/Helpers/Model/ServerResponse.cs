@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LightController.HTTP
+namespace LightController.Helpers.Model
 {
     public class ServerResponse
     {

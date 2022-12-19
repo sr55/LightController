@@ -7,17 +7,19 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace LightController.HTTP
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
-    using System.Text;
-    using System.Text.Json;
-    using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using LightController.Helpers.Model;
+using Microsoft.VisualBasic.CompilerServices;
 
-    public class HttpRequestBase
+namespace LightController.Helpers
+{
+    public class HttpHelper
     {
         public static JsonSerializerOptions JsonOptions = new JsonSerializerOptions
                                                           {
@@ -26,9 +28,9 @@ namespace LightController.HTTP
                                                               PropertyNameCaseInsensitive = true
                                                           };
 
-        public async Task<ServerResponse> MakePOSTRequest(string url, string json, Dictionary<string, string> headers)
+        public static async Task<ServerResponse> MakePOSTRequest(string url, object content, Dictionary<string, string> headers, string contentType = "application/json")
         {
-            if (string.IsNullOrEmpty(json))
+            if (content == null)
             {
                 throw new InvalidOperationException("No Post Values Found.");
             }
@@ -44,7 +46,14 @@ namespace LightController.HTTP
                     }
                 }
 
-                requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                if (contentType == "application/json")
+                {
+                    requestMessage.Content = new StringContent((string)content, Encoding.UTF8, contentType);
+                }
+                else
+                {
+                    requestMessage.Content = new ByteArrayContent((byte[])content);
+                }
 
                 using (HttpResponseMessage response = await client.SendAsync(requestMessage))
                 {
@@ -61,7 +70,7 @@ namespace LightController.HTTP
             return null;
         }
 
-        public async Task<ServerResponse> MakeGETRequest(string url, Dictionary<string, string> headers)
+        public static async Task<ServerResponse> MakeGETRequest(string url, Dictionary<string, string> headers)
         {
             using (HttpClient client = new HttpClient())
             {

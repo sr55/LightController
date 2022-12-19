@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using LightController.API;
 using LightController.API.Model;
+using LightController.Helpers;
 using LightController.Services.Config;
 using LightController.Services.Config.Model;
 using LightController.Win.Demo.LightModes;
@@ -50,12 +51,19 @@ namespace LightController.Win.Demo
             brightness.GetBrightness(authResponse);
             brightness.SetBrightness(authResponse, 100);
 
+            // Status
+            Status status = new Status(options.LightsUrl);
+            status.GetStatus(authResponse);
+            status.GetDeviceName(authResponse);
+
+
             switch (options.Mode)
             {
                 case 1: // A Demo Mode
                     CarolDemoMode carolDemoMode = new CarolDemoMode(options.LedCount, options.IsRGBWSet, realTimeMode);
+                    ConsoleOutput.WriteLine("Press enter to begin.", ConsoleColor.White);
                     Console.Read();
-                    Task t = carolDemoMode.Run(authResponse);
+                    Task t = carolDemoMode.Run(authResponse, options);
                     t.Wait();
                     break;
 
@@ -64,6 +72,16 @@ namespace LightController.Win.Demo
                     Console.Read();
                     Task t2 = mapTreeLightsMode.Run(authResponse);
                     t2.Wait();
+                    break;
+
+                case 3: // Flash each LED to allow mapping
+                    MapLinesMode mapTreeLightsModeB = new MapLinesMode(options.LedCount, realTimeMode);
+                    Console.Read();
+                    Task t3 = mapTreeLightsModeB.RunManual(authResponse);
+                    t3.Wait();
+                    break;
+                case 4: // Reset
+
                     break;
             }
 

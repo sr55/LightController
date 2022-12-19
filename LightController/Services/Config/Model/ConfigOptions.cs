@@ -25,5 +25,7 @@ namespace LightController.Services.Config.Model
         public int LedCount { get; set; }
 
         public int Mode { get; set; }
+
+        public bool SendHttpFrames { get; set; }
     }
 }

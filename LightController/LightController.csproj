@@ -21,4 +21,8 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="UDP\" />
+  </ItemGroup>
+
 </Project>
