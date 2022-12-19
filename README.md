@@ -20,6 +20,4 @@ Demo Project Provided for Windows.
 
 
 ## Thanks
-- [LibVLCSharp](https://code.videolan.org/videolan/LibVLCSharp) LGPL-2.1-or-later
-- [VideoLan.LibVLC.Windows](https://code.videolan.org/videolan/libvlc-nuget) LGPL-2.1-or-later
 - [NAudio](https://github.com/naudio/NAudio) MPL
